@@ -158,18 +158,28 @@
         if (!Array.isArray(v)) return;
         d[s.id] = v.slice(0, 60).filter(function (x) { return x && typeof x === 'object'; }).map(function (x) {
           var o = elementoVacio(s);
-          s.campos.forEach(function (c) { o[c.id] = texto(x[c.id]); });
+          s.campos.forEach(function (c) { o[c.id] = limpio(c, x[c.id]); });
           return o;
-        });
+        }).filter(function (o) { return s.campos.some(function (c) { return o[c.id]; }); });
       } else if (v && typeof v === 'object') {
-        s.campos.forEach(function (c) { d[s.id][c.id] = texto(v[c.id]); });
+        s.campos.forEach(function (c) { d[s.id][c.id] = limpio(c, v[c.id]); });
       }
     });
     return d;
   }
 
+  /* Descarta lo que la IA copió del molde sin llenar: las opciones con « | » o el formato de fecha. */
+  function limpio(c, v) {
+    var t = texto(v);
+    if (!t) return '';
+    if (t.indexOf(' | ') >= 0 || t === 'dd/mm/aaaa' || t === 'mm/aaaa') return '';
+    return t;
+  }
+
   function texto(v) {
     if (v === null || v === undefined) return '';
+    if (v === true) return 'Sí';
+    if (v === false) return 'No';
     if (typeof v === 'number') return String(v);
     if (typeof v !== 'string') return '';
     return v.trim().slice(0, 600);
@@ -178,8 +188,28 @@
   /* Busca el primer objeto JSON dentro de un texto (la IA suele envolverlo en ```json). */
   function extraerJSON(textoLargo) {
     if (typeof textoLargo !== 'string') return null;
-    var inicio = textoLargo.indexOf('{');
-    if (inicio < 0) return null;
+    var desde = 0, hallado = null;
+    while (true) {
+      var inicio = textoLargo.indexOf('{', desde);
+      if (inicio < 0) return hallado;
+      var r = objetoDesde(textoLargo, inicio);
+      if (r.obj && esDatos(r.obj)) hallado = r.obj; // si pegaron todo el chat, gana el último bloque con datos
+      desde = r.fin > inicio ? r.fin : inicio + 1;
+    }
+  }
+
+  /* Un bloque sirve si trae alguna sección conocida con un valor que no sea del molde. */
+  function esDatos(obj) {
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false;
+    var n = normalizar(obj), hay = false;
+    SECCIONES.forEach(function (s) {
+      if (s.tipo === 'lista') { if (n[s.id].length) hay = true; }
+      else s.campos.forEach(function (c) { if (n[s.id][c.id]) hay = true; });
+    });
+    return hay;
+  }
+
+  function objetoDesde(textoLargo, inicio) {
     var nivel = 0, enCadena = false, escape = false;
     for (var i = inicio; i < textoLargo.length; i++) {
       var ch = textoLargo[i];
@@ -194,11 +224,11 @@
       else if (ch === '}') {
         nivel--;
         if (nivel === 0) {
-          try { return JSON.parse(textoLargo.slice(inicio, i + 1)); } catch (e) { return null; }
+          try { return { obj: JSON.parse(textoLargo.slice(inicio, i + 1)), fin: i + 1 }; } catch (e) { return { obj: null, fin: inicio + 1 }; }
         }
       }
     }
-    return null;
+    return { obj: null, fin: textoLargo.length };
   }
 
   var api = { SECCIONES: SECCIONES, vacio: vacio, elementoVacio: elementoVacio, normalizar: normalizar, extraerJSON: extraerJSON };

@@ -59,6 +59,7 @@
   function construirPrompt() {
     var molde = {};
     E.SECCIONES.forEach(function (s) {
+      if (s.id === 'firma') return; // la declaración juramentada la hace la persona, no la IA
       var o = {};
       s.campos.forEach(function (c) {
         var pista = c.opciones ? c.opciones.join(' | ') : (c.formato || '');
@@ -70,13 +71,13 @@
       'Vas a organizar mi hoja de vida en los campos del Formato Único de Hoja de Vida Persona Natural de Función Pública (Colombia). Te la pego al final.',
       '',
       'Reglas:',
-      '1. Responde solo con un bloque JSON que siga exactamente este molde. Las llaves no se cambian.',
+      '1. Responde primero con un único bloque JSON que siga exactamente este molde. Las llaves no se cambian.',
       '2. Donde el molde muestra opciones separadas por « | », escoge una de ellas, escrita igual.',
       '3. Fechas completas en dd/mm/aaaa; terminación de estudios y fecha de grado en mm/aaaa.',
       '4. No inventes nada. Si un dato no aparece en mi hoja de vida, deja "" (vacío). No completes con suposiciones.',
       '5. Experiencia laboral en orden cronológico, empezando por el empleo o contrato actual (con "retiro" vacío). Un contrato de prestación de servicios va con "ocupacion": "Trabajador independiente".',
       '6. Educación superior y cursos en orden cronológico. Los diplomados y cursos van en "trabajo"; los títulos técnicos, tecnológicos, universitarios y de posgrado, en "superior".',
-      '7. Después del bloque JSON, escribe una lista corta titulada «Me falta» con los datos que el formato pide y que no encontraste.',
+      '7. Después del bloque JSON, escribe solo una lista corta titulada «Me falta» con los datos que el formato pide y que no encontraste.',
       '',
       'Molde:',
       '```json',
@@ -124,7 +125,7 @@
   function revisarFecha(input, formato) {
     var v = input.value.trim();
     var ayuda = document.getElementById(input.id + '-ayuda');
-    var bien = !v || (formato === 'dd/mm/aaaa' ? X.leerFecha(v) !== null : /^(0?[1-9]|1[0-2])\/\d{4}$/.test(v));
+    var bien = !v || /^(actual|actualmente|presente|hoy|a la fecha|vigente)$/i.test(v) || (formato === 'dd/mm/aaaa' ? X.leerFecha(v) !== null : /^(0?[1-9]|1[0-2])\/\d{4}$/.test(v));
     input.classList.toggle('mal', !bien);
     if (ayuda && !ayuda.dataset.fijo) { ayuda.textContent = bien ? '' : 'Escríbela como ' + formato + '.'; ayuda.classList.toggle('alerta', !bien); }
   }
@@ -254,7 +255,7 @@
     r.filas.forEach(function (f) {
       tb.appendChild(el('tr', {}, [el('td', { texto: f.ocupacion }), el('td', { clase: 'n', texto: String(f.tiempo.anios) }), el('td', { clase: 'n', texto: String(f.tiempo.meses) })]));
     });
-    tb.appendChild(el('tr', { clase: 'total' }, [el('td', { texto: 'Total tiempo de experiencia' }), el('td', { clase: 'n', texto: String(r.total.tiempo.anios) }), el('td', { clase: 'n', texto: String(r.total.tiempo.meses) })]));
+    tb.appendChild(el('tr', { clase: 'total' }, [el('td', { texto: 'Total (referencia; no está en el formato de 2026)' }), el('td', { clase: 'n', texto: String(r.total.tiempo.anios) }), el('td', { clase: 'n', texto: String(r.total.tiempo.meses) })]));
     tabla.appendChild(tb);
     var avisos = [];
     if (r.errores.length) avisos.push('Hay ' + r.errores.length + ' fecha(s) que no se pudieron leer o con retiro antes del ingreso: revísalas arriba.');
@@ -262,7 +263,7 @@
     var b = el('button', { type: 'button', clase: 'boton boton--claro boton--chico', texto: 'Copiar sección' });
     b.addEventListener('click', function () {
       copiar(['7. TIEMPO TOTAL DE EXPERIENCIA'].concat(r.filas.map(function (f) { return f.ocupacion + ': ' + textoTiempo(f.tiempo); }))
-        .concat(['Total tiempo de experiencia: ' + textoTiempo(r.total.tiempo)]).join('\n'), b);
+        .join('\n'), b);
     });
     return el('section', { clase: 'tarjeta copiar__sec' }, [
       el('div', { clase: 'copiar__cab' }, [el('h3', {}, [el('span', { clase: 'seccion__num', texto: '7' }), 'Tiempo total de experiencia']), b]),
@@ -288,7 +289,7 @@
       if (s.id === 'firma') {
         var t = el('section', { clase: 'imp__sec' }, [el('h2', { texto: '7. Tiempo total de experiencia' })]);
         var dl = el('dl');
-        r.filas.concat([{ ocupacion: 'Total tiempo de experiencia', tiempo: r.total.tiempo }]).forEach(function (f) {
+        r.filas.concat([{ ocupacion: 'Total (referencia; no está en el formato de 2026)', tiempo: r.total.tiempo }]).forEach(function (f) {
           dl.appendChild(el('dt', { texto: f.ocupacion })); dl.appendChild(el('dd', { texto: textoTiempo(f.tiempo) }));
         });
         t.appendChild(dl); raiz.appendChild(t);

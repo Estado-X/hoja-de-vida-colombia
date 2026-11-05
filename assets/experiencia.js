@@ -27,7 +27,9 @@
     var lista = [], errores = [];
     (periodos || []).forEach(function (p, i) {
       var a = leerFecha(p.ingreso);
-      var b = p.retiro && String(p.retiro).trim() ? leerFecha(p.retiro) : hoyUTC(hoy);
+      var ret = p.retiro ? String(p.retiro).trim() : '';
+      if (/^(actual|actualmente|presente|hoy|a la fecha|vigente)$/i.test(ret)) ret = '';
+      var b = ret ? leerFecha(ret) : hoyUTC(hoy);
       if (a === null) { if (p.ingreso || p.retiro) errores.push(i); return; }
       if (b === null || b < a) { errores.push(i); return; }
       lista.push([a, b]);

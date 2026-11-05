@@ -102,3 +102,23 @@ test('normalizar ignora lo que no es del molde y no se rompe con basura', () => 
   assert.strictEqual(d.superior[0].titulo, '42');
   assert.strictEqual(E.extraerJSON('sin llaves'), null);
 });
+
+test('descarta lo que la IA copió del molde sin llenar', () => {
+  const d = E.normalizar({ personales: { tipo_documento: 'C.C. | C.E. | Pasaporte', nacimiento_fecha: 'dd/mm/aaaa', nombres: 'Ana' }, docente: [{ institucion: '' }], superior: [{ graduado: true, titulo: 'Derecho' }] });
+  assert.strictEqual(d.personales.tipo_documento, '');
+  assert.strictEqual(d.personales.nacimiento_fecha, '');
+  assert.strictEqual(d.personales.nombres, 'Ana');
+  assert.deepStrictEqual(d.docente, []);
+  assert.strictEqual(d.superior[0].graduado, 'Sí');
+});
+
+test('encuentra el bloque aunque haya llaves antes o el chat completo', () => {
+  const t = 'Usé el molde {campos}. Molde: {"personales":{"nombres":""}}\nRespuesta: {"personales":{"nombres":"Ana"}}';
+  assert.strictEqual(E.normalizar(E.extraerJSON(t)).personales.nombres, 'Ana');
+});
+
+test('«actual» en la fecha de retiro cuenta como empleo vigente', () => {
+  const r = X.dias([{ ingreso: '04/11/2025', retiro: 'Actual' }], HOY);
+  assert.strictEqual(r.dias, 366);
+  assert.deepStrictEqual(r.errores, []);
+});
