@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tu hoja de vida para el Formato Único de Función Pública · Estado X</title>
+<meta name="description" content="Organiza tu hoja de vida en los campos del Formato Único de Hoja de Vida de Función Pública y el SIGEP, lista para copiar y pegar. Gratis y sin enviar tus datos.">
+<meta property="og:title" content="Tu hoja de vida, lista para el Formato Único">
+<meta property="og:description" content="Tu IA la organiza, tú la revisas y la copias campo por campo en el formato o en el SIGEP.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/estilos.css">
+</head>
+<body>
+<header class="banda">
+  <div class="contenedor banda__in">
+    <p class="kicker">Herramienta abierta · Estado X</p>
+    <h1>Tu hoja de vida, lista para el <em>Formato Único</em></h1>
+    <p class="banda__sub">Para trabajar con el Estado, como empleado o contratista, te piden la hoja de vida en el formato de Función Pública o en el SIGEP. Tu información ya existe, pero en otro orden. Aquí tu IA la organiza, tú la revisas y la copias campo por campo.</p>
+    <ol class="pasos">
+      <li><a href="#paso-1"><b>1</b> Llévalo a tu IA</a></li>
+      <li><a href="#paso-2"><b>2</b> Revisa y completa</a></li>
+      <li><a href="#paso-3"><b>3</b> Copia y pega</a></li>
+    </ol>
+  </div>
+</header>
+
+<main class="contenedor">
+  <section class="bloque" id="paso-1" aria-labelledby="t-1">
+    <div class="tarjeta">
+      <h2 id="t-1"><span class="paso">1</span> Llévalo a tu IA</h2>
+      <p class="ayuda">Copia este mensaje y pégalo en la IA que uses (Claude, ChatGPT, Gemini o Copilot). Al final, pega o adjunta tu hoja de vida actual. La IA te devuelve un bloque con tus datos ordenados en los campos del formato.</p>
+      <label class="sr" for="prompt">Mensaje para tu IA</label>
+      <textarea id="prompt" class="codigo" rows="9" readonly></textarea>
+      <div class="acciones">
+        <button type="button" class="boton" id="copiar-prompt">Copiar el mensaje</button>
+      </div>
+      <div class="separador"></div>
+      <label class="etq" for="respuesta">Pega aquí lo que te respondió la IA</label>
+      <textarea id="respuesta" rows="6" placeholder="Pega la respuesta completa, con el bloque que empieza por { y termina en }"></textarea>
+      <div class="acciones">
+        <button type="button" class="boton" id="usar-respuesta">Llenar el formulario</button>
+        <a class="boton boton--claro" href="#paso-2">Prefiero llenarlo a mano</a>
+      </div>
+      <p id="msg-ia" class="mensaje" role="status" hidden></p>
+      <p class="nota">Lo que pegas aquí se queda en tu navegador: esta página no tiene servidor. Lo que compartes con tu IA queda sujeto a las condiciones de esa IA.</p>
+    </div>
+  </section>
+
+  <section class="bloque" id="paso-2" aria-labelledby="t-2">
+    <h2 id="t-2"><span class="paso">2</span> Revisa y completa</h2>
+    <p class="ayuda">Las secciones siguen el orden del Formato Único (versión de marzo de 2026). Revisa lo que llenó la IA y completa lo que falte.</p>
+    <div id="formulario" class="formulario"></div>
+  </section>
+
+  <section class="bloque" id="paso-3" aria-labelledby="t-3">
+    <h2 id="t-3"><span class="paso">3</span> Copia y pega</h2>
+    <p class="ayuda">Cada dato tiene su botón «Copiar». Ve pegándolo en el SIGEP o en el formato oficial, en el mismo orden.</p>
+    <div class="tarjeta donde">
+      <h3>¿Dónde lo pegas?</h3>
+      <ul class="reglas">
+        <li><strong>Si te vas a vincular con una entidad pública</strong> (empleo o contrato de prestación de servicios), la hoja de vida se diligencia en el <a href="https://www.funcionpublica.gov.co/web/sigep2" target="_blank" rel="noopener">SIGEP II</a>, con el usuario que te habilita la entidad.</li>
+        <li><strong>Si te la piden en el formato</strong>, descarga el <a href="https://www.funcionpublica.gov.co/documents/d/guest/formato_hoja_de_vida" target="_blank" rel="noopener">Formato Único de Hoja de Vida de Función Pública</a> y pasa los datos con esta lista al lado.</li>
+        <li>La firma, la declaración de inhabilidades y los certificados los pones tú. Nada de esto reemplaza el formato firmado.</li>
+      </ul>
+      <div class="acciones">
+        <button type="button" class="boton" id="imprimir">Imprimir o guardar en PDF</button>
+      </div>
+    </div>
+    <div id="copiar" class="copiar"></div>
+  </section>
+
+  <section class="bloque" aria-labelledby="t-datos">
+    <div class="tarjeta">
+      <h2 id="t-datos">Tus datos</h2>
+      <label class="check"><input type="checkbox" id="recordar"> <span>Recordar en este navegador (no lo marques en un computador compartido)</span></label>
+      <div class="acciones">
+        <button type="button" class="boton boton--claro" id="descargar">Descargar mis datos (.json)</button>
+        <label class="boton boton--claro archivo">Cargar mis datos (.json)<input type="file" id="cargar" accept=".json,application/json"></label>
+        <button type="button" class="boton boton--peligro" id="borrar">Borrar todo</button>
+      </div>
+      <div id="confirmar-borrar" class="confirmar" hidden>
+        <p>¿Borrar todo lo que escribiste en esta página? No se puede deshacer.</p>
+        <button type="button" class="boton boton--peligro" id="si-borrar">Sí, borrar</button>
+        <button type="button" class="boton boton--claro" id="no-borrar">Cancelar</button>
+      </div>
+      <p id="msg-datos" class="mensaje" role="status" hidden></p>
+    </div>
+  </section>
+
+  <section class="bloque dos">
+    <div class="tarjeta">
+      <h2>Cómo funciona</h2>
+      <ul class="reglas">
+        <li>Es una página estática: no tiene servidor ni base de datos y no envía a ningún lado lo que escribes.</li>
+        <li>El mensaje para la IA trae el molde con los campos del formato; la página lee el bloque que te devuelve y llena el formulario.</li>
+        <li>El tiempo total de experiencia (sección 7) se calcula con tus fechas: los periodos que se cruzan cuentan una sola vez, como dice el Decreto 1083 de 2015.</li>
+        <li>Base legal del formato: Leyes 190 de 1995, 489 y 443 de 1998; Decreto 1083 de 2015, título 17 (SIGEP).</li>
+      </ul>
+    </div>
+    <div class="tarjeta">
+      <h2>Límites</h2>
+      <ul class="reglas">
+        <li>Es una ayuda para organizar, <strong>no el formato oficial</strong> ni un trámite ante Función Pública.</li>
+        <li>Sigue la versión del formato de marzo de 2026 (9 secciones). La página de descargas de Función Pública todavía tiene la versión anterior de 6 secciones; los datos son los mismos, en otro orden.</li>
+        <li>La IA puede equivocarse o inventar: revisa cada dato contra tus certificados.</li>
+        <li>El tiempo total es una referencia en meses calendario (los días sueltos se suman de a 30). La entidad lo verifica con tus certificaciones laborales.</li>
+        <li>No incluye el Formato de Declaración de Bienes y Rentas ni los soportes.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<div id="impresion" class="impresion" aria-hidden="true"></div>
+
+<footer class="pie">
+  <div class="contenedor pie__in">
+    <p>Todo pasa en tu navegador: lo que escribes no se envía a ningún lado.</p>
+    <p>Inspirada en <a href="https://github.com/AmruthPillai/Reactive-Resume" target="_blank" rel="noopener">Reactive Resume</a> de Amruth Pillai (licencia MIT). Código abierto en <a href="https://github.com/Estado-X/hoja-de-vida-colombia" target="_blank" rel="noopener">GitHub</a>.</p>
+    <p class="firma">Hecho por <a href="https://estadox.com" target="_blank" rel="noopener">Estado <em>X</em></a></p>
+  </div>
+</footer>
+<script src="assets/esquema.js"></script>
+<script src="assets/experiencia.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
